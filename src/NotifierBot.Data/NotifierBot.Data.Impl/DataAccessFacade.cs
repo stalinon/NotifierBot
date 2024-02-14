@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NotifierBot.Data.Repositories;
 
-namespace NotifierBot.Data.Impl.Repositories;
+namespace NotifierBot.Data.Impl;
 
 /// <inheritdoc cref="IDataAccessFacade" />
 internal sealed class DataAccessFacade : IDataAccessFacade
