@@ -1,9 +1,15 @@
+using NotifierBot.Data.Impl;
+using NotifierBot.Infrastructure.Maintenance.Enums;
 using NotifierBot.Presentation.Web.Components;
+
+const EnvironmentStatus status = EnvironmentStatus.USE_MOCK;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddRazorComponents()
+builder.Services
+    .SetupDataAccessLayer(status)
+    .AddRazorComponents()
     .AddInteractiveServerComponents();
 
 var app = builder.Build();
@@ -22,6 +28,6 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+   .AddInteractiveServerRenderMode();
 
 app.Run();
