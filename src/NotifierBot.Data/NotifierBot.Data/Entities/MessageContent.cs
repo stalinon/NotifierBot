@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using NotifierBot.Infrastructure.Models.Abstractions;
 using NotifierBot.Infrastructure.Models.Enums;
 
 namespace NotifierBot.Data.Entities;
@@ -6,23 +7,17 @@ namespace NotifierBot.Data.Entities;
 /// <summary>
 ///     Содержимое сообщения
 /// </summary>
-public sealed class MessageContent
+public sealed class MessageContent : IMessage
 {
-    /// <summary>
-    ///     Текст сообщения
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("text")]
     public string Text { get; set; } = default!;
 
-    /// <summary>
-    ///     Приложение к сообщению
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("attachment")]
     public byte[]? Attachment { get; set; }
 
-    /// <summary>
-    ///     Тип приложения
-    /// </summary>
+    /// <inheritdoc />
     [JsonPropertyName("attachment_type")]
     public AttachmentType? AttachmentType { get; set; }
 }
