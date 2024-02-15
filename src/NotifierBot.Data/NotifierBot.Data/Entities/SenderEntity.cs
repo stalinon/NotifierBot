@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using NotifierBot.Infrastructure.Maintenance.Configuration;
 using NotifierBot.Infrastructure.Models.Enums;
 
 namespace NotifierBot.Data.Entities;
@@ -8,7 +9,7 @@ namespace NotifierBot.Data.Entities;
 ///     Сущность отправителя
 /// </summary>
 [Table("senders")]
-public sealed class SenderEntity : IHasId, IEntityLifecycle, IConfigurable
+public sealed class SenderEntity : IHasId, IEntityLifecycle, IConfigurable, ISenderSettings
 {
     /// <inheritdoc />
     [Column("id")]
@@ -22,6 +23,10 @@ public sealed class SenderEntity : IHasId, IEntityLifecycle, IConfigurable
     [Column("updated")]
     public DateTime Updated { get; set; }
 
+    /// <inheritdoc />
+    [Column("token")]
+    public string Token { get; set; } = default!;
+
     /// <summary>
     ///     Тип отправителя
     /// </summary>
@@ -33,12 +38,6 @@ public sealed class SenderEntity : IHasId, IEntityLifecycle, IConfigurable
     /// </summary>
     [Column("name")]
     public string Name { get; set; } = default!;
-
-    /// <summary>
-    ///     Токен доступа
-    /// </summary>
-    [Column("token")]
-    public string Token { get; set; } = default!;
 
     /// <inheritdoc />
     public static void Setup(ModelBuilder modelBuilder)

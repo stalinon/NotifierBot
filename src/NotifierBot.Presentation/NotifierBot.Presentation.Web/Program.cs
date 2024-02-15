@@ -6,6 +6,8 @@ const EnvironmentStatus status = EnvironmentStatus.USE_MOCK;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Logging.AddConsole();
+
 // Add services to the container.
 builder.Services
     .SetupDataAccessLayer(status)

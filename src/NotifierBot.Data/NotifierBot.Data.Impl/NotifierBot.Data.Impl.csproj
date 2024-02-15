@@ -12,6 +12,7 @@
 
     <ItemGroup>
       <PackageReference Include="Moq.EntityFrameworkCore" Version="8.0.1.2" />
+      <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-preview.1" />
     </ItemGroup>
 
 
