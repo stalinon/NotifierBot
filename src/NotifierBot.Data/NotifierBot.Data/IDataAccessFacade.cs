@@ -1,4 +1,6 @@
-namespace NotifierBot.Data.Repositories;
+using NotifierBot.Data.Repositories;
+
+namespace NotifierBot.Data;
 
 /// <summary>
 ///     Единая точка доступа в БД
