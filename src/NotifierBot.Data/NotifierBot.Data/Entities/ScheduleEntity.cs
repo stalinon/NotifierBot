@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
+using NotifierBot.Infrastructure.Maintenance.Configuration;
 
 namespace NotifierBot.Data.Entities;
 
@@ -7,7 +8,7 @@ namespace NotifierBot.Data.Entities;
 ///     Расписания
 /// </summary>
 [Table("schedules")]
-public sealed class ScheduleEntity : IHasId, IEntityLifecycle, IConfigurable
+public sealed class ScheduleEntity : IHasId, IEntityLifecycle, IConfigurable, IScheduleSettings
 {
     /// <inheritdoc />
     [Column("id")]
@@ -21,22 +22,18 @@ public sealed class ScheduleEntity : IHasId, IEntityLifecycle, IConfigurable
     [Column("updated")]
     public DateTime Updated { get; set; }
 
-    /// <summary>
-    ///     Идентификатор сообщения
-    /// </summary>
+    /// <inheritdoc />
     [Column("message_id"), ForeignKey(nameof(Message))]
     public long MessageId { get; set; }
+
+    /// <inheritdoc />
+    [Column("cron")]
+    public string CronExpression { get; set; } = default!;
 
     /// <summary>
     ///     Сообщение
     /// </summary>
     public MessageEntity Message { get; set; } = default!;
-
-    /// <summary>
-    ///     Выражение для установки на расписание
-    /// </summary>
-    [Column("cron")]
-    public string CronExpression { get; set; } = default!;
 
     /// <summary>
     ///     Признак активности расписания
@@ -48,7 +45,7 @@ public sealed class ScheduleEntity : IHasId, IEntityLifecycle, IConfigurable
     public static void Setup(ModelBuilder modelBuilder)
     {
         var entityBuilder = modelBuilder.Entity<ScheduleEntity>();
-        entityBuilder.HasIndex(p => p.MessageId).IsUnique();
+        entityBuilder.HasIndex(p => new { p.MessageId, p.CronExpression }).IsUnique();
         entityBuilder.HasIndex(p => p.IsActive);
     }
 }
