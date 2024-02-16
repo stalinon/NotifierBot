@@ -38,19 +38,8 @@ internal sealed class AuthService : IAuthService
         {
             throw new ErrorException(HttpStatusCode.Forbidden, $"Неверные креды.");
         }
-        
-        var claimsIdentity = CreateUserIdentity(email);
 
-        var authProperties = new AuthenticationProperties
-        {
-            IsPersistent = true,
-        };
-
-        await _httpContextAccessor.HttpContext!.SignInAsync(
-            AuthScheme,
-            new ClaimsPrincipal(claimsIdentity),
-            authProperties
-        );
+        await _httpContextAccessor.HttpContext!.AuthenticateAsync(AuthScheme);
     }
 
     /// <summary>

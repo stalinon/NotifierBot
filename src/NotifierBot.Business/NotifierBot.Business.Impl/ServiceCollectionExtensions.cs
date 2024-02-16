@@ -3,6 +3,8 @@ using NotifierBot.Business.Impl.Services;
 using NotifierBot.Business.Impl.Services.DataManagement;
 using NotifierBot.Business.Services;
 using NotifierBot.Business.Services.DataManagement;
+using NotifierBot.Data.Impl;
+using NotifierBot.Infrastructure.Maintenance.Enums;
 
 namespace NotifierBot.Business.Impl;
 
@@ -16,6 +18,9 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection SetupBusinessLayer(this IServiceCollection services)
     {
+        const EnvironmentStatus status = EnvironmentStatus.USE_MOCK;
+        services.SetupDataAccessLayer(status);
+        
         services.AddSingleton<ISenderManager, SenderManager>();
         services.AddSingleton<IRecipientManager, RecipientManager>();
         services.AddSingleton<IMessageManager, MessageManager>();
