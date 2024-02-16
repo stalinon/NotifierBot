@@ -1,3 +1,4 @@
+using NotifierBot.Business.Impl;
 using NotifierBot.Data.Impl;
 using NotifierBot.Infrastructure.Maintenance.Enums;
 using NotifierBot.Presentation.Web.Components;
@@ -10,6 +11,7 @@ builder.Logging.AddConsole();
 
 // Add services to the container.
 builder.Services
+    .SetupBusinessLayer()
     .SetupDataAccessLayer(status)
     .AddRazorComponents()
     .AddInteractiveServerComponents();

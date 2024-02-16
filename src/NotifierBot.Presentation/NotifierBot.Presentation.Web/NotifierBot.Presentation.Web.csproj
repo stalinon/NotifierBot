@@ -7,6 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\NotifierBot.Business\NotifierBot.Business.Impl\NotifierBot.Business.Impl.csproj" />
       <ProjectReference Include="..\..\NotifierBot.Data\NotifierBot.Data.Impl\NotifierBot.Data.Impl.csproj" />
     </ItemGroup>
 
