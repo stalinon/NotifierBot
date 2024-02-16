@@ -9,6 +9,33 @@
     <ItemGroup>
       <ProjectReference Include="..\..\NotifierBot.Business\NotifierBot.Business.Impl\NotifierBot.Business.Impl.csproj" />
       <ProjectReference Include="..\..\NotifierBot.Data\NotifierBot.Data.Impl\NotifierBot.Data.Impl.csproj" />
+      <ProjectReference Include="..\NotifierBot.Presentation.Impl\NotifierBot.Presentation.Impl.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Shared\NotFoundPlaceholder.razor" />
+      <_ContentIncludedByDefault Remove="Shared\RedirectToLoginPage.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\NotFoundPlaceholder.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\RedirectToLoginPage.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Error.cshtml" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Login.cshtml" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Logout.cshtml" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Index.razor" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Components\Pages\Error.cshtml" />
+      <AdditionalFiles Include="Components\Pages\Index.razor" />
+      <AdditionalFiles Include="Components\Pages\Logout.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <UpToDateCheckInput Remove="Shared\NotFoundPlaceholder.razor" />
+      <UpToDateCheckInput Remove="Shared\RedirectToLoginPage.razor" />
     </ItemGroup>
 
 </Project>

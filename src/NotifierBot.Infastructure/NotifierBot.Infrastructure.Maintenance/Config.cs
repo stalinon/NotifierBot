@@ -15,4 +15,12 @@ public static class Config
     {
         return new DatabaseConfiguration();
     }
+    
+    /// <summary>
+    ///     Получить креды супер админа
+    /// </summary>
+    public static ICredentials GetSuperAdminCredentials()
+    {
+        return new SuperAdminCredentials();
+    }
 }

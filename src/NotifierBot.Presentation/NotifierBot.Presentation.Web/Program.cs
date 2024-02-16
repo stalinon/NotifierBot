@@ -1,6 +1,8 @@
 using NotifierBot.Business.Impl;
 using NotifierBot.Data.Impl;
 using NotifierBot.Infrastructure.Maintenance.Enums;
+using NotifierBot.Presentation.Impl;
+using NotifierBot.Presentation.Web;
 using NotifierBot.Presentation.Web.Components;
 
 const EnvironmentStatus status = EnvironmentStatus.USE_MOCK;
@@ -12,9 +14,13 @@ builder.Logging.AddConsole();
 // Add services to the container.
 builder.Services
     .SetupBusinessLayer()
-    .SetupDataAccessLayer(status)
-    .AddRazorComponents()
-    .AddInteractiveServerComponents();
+    .SetupDataAccessLayer(status);
+
+builder.Services.AddRazorComponents();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+builder.Services.AddAuthService();
 
 var app = builder.Build();
 
@@ -26,7 +32,8 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseStaticFiles();
 app.UseAntiforgery();
