@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using NotifierBot.Infrastructure.Maintenance.Configuration;
 using NotifierBot.Infrastructure.Models.Abstractions;
 
 namespace NotifierBot.Infrastructure.Models.Api;
@@ -6,7 +7,7 @@ namespace NotifierBot.Infrastructure.Models.Api;
 /// <summary>
 ///     Модель расписания
 /// </summary>
-public sealed class Schedule : IModelWithId
+public sealed class Schedule : IModelWithId, IScheduleSettings
 {
     /// <summary>
     ///     Идентификатор в БД
