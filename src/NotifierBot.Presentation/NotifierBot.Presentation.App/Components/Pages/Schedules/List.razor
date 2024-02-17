@@ -1,0 +1,43 @@
+﻿@page "/schedules/list"
+@using NotifierBot.Infrastructure.Models.Api
+@using NotifierBot.Business.Services.DataManagement
+@inject IDataManagementFacade DataManager
+
+<PageTitle>Расписания</PageTitle>
+
+<MudDataGrid bind-RowsPerPage="@_limit"
+             CurrentPage="@_currentPage"
+             ServerData="@(new Func<GridState<Schedule>, Task<GridData<Schedule>>>(LoadData))"
+             RowClassFunc="@((schedule, i) => schedule.IsActive ? "mud-success" : "" )">
+    <Columns>
+        <PropertyColumn T="Schedule" TProperty="long" Property="@(x => x.Id)" Title="Id" />
+        <PropertyColumn T="Schedule" TProperty="long" Property="@(x => x.MessageId)" Title="Message" />
+        <PropertyColumn T="Schedule" TProperty="string" Property="@(x => x.CronExpression)" Title="Cron" />
+        <PropertyColumn T="Schedule" TProperty="DateTime" Property="@(x => x.Created)" Title="Created" />
+        <PropertyColumn T="Schedule" TProperty="DateTime" Property="@(x => x.Updated)" Title="Updated" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Schedule" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private readonly int _limit = 30;
+    private int _currentPage = 1;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private async Task<GridData<Schedule>> LoadData(GridState<Schedule> data)
+    {
+        var recipients = await DataManager.Schedules.ListAsync(data.PageSize, (data.Page - 1) * _limit);
+        var total = await DataManager.Schedules.CountAsync();
+        return new GridData<Schedule>
+        {
+            Items = recipients,
+            TotalItems = total
+        };
+    }
+}

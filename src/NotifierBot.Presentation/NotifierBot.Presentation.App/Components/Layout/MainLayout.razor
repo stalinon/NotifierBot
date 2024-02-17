@@ -1,0 +1,98 @@
+﻿@using NotifierBot.Infrastructure.Maintenance.Configuration
+@using NotifierBot.Presentation.Models
+@using NotifierBot.Presentation.Services
+@using NotifierBot.Infrastructure.Maintenance
+@inherits LayoutComponentBase
+@inject ILocalStorage LocalStorage
+
+
+<MudThemeProvider IsDarkMode="true"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<MudLayout>
+    @if (_loggedIn)
+    {
+        <MudAppBar>
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(_ => DrawerToggle())"/>
+            <MudSpacer />
+            <MudText Typo="Typo.h6">Notifier</MudText>
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="@(_ => Logout())"/>
+        </MudAppBar>
+        <MudDrawer @bind-Open="@_drawerOpen" ClipMode="@DrawerClipMode.Docked" Breakpoint="@Breakpoint.Lg" PreserveOpenState="@false" Elevation="1" Variant="@DrawerVariant.Mini">
+            <MudNavMenu>
+                <MudNavLink Href="/senders/list" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Send">Отправители</MudNavLink>
+                <MudNavLink Href="/recipients/list" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.CallReceived">Получатели</MudNavLink>
+                <MudNavLink Href="/messages/list" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Message">Сообщения</MudNavLink>
+                <MudNavLink Href="/schedules/list" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Schedule">Расписания</MudNavLink>
+            </MudNavMenu>
+        </MudDrawer>
+        <MudMainContent>
+            @Body
+        </MudMainContent>
+    }
+    else
+    {
+        <MudMainContent Class="w-100">
+            <MudCard Class="w-25" Style="margin: auto;">
+                <MudForm Model="@_model" @ref="@_form">
+                    <MudCardContent>
+                        <MudTextField Label="Email" Class="mt-3"
+                                      @bind-Value="@_model.Login" For="@(() => _model.Login)"/>
+                        <MudTextField Label="Password" Class="mt-3"
+                                      @bind-Value="@_model.Password" For="@(() => _model.Password)"/>
+                    </MudCardContent>
+                </MudForm>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick=@(async () => await Login())>Login</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudMainContent>
+    }
+</MudLayout>
+
+@code {
+    bool _drawerOpen;
+    private bool _loggedIn;
+    private MudForm? _form;
+    private readonly ICredentials _credentials = Config.GetSuperAdminCredentials();
+    private readonly AuthModel _model = new();
+
+    private void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+    
+    private async Task Login()
+    {
+        if (!string.IsNullOrEmpty(_model.Login) && !string.IsNullOrWhiteSpace(_model.Password)
+            && _model.Login == _credentials.Login && _model.Password == _credentials.Password)
+        {
+            _loggedIn = true;
+            _model.Password = null;
+            await LocalStorage.SaveStringAsync("user", _model.Login);
+            StateHasChanged();
+        }
+    }
+
+    public async Task Logout()
+    {
+        _model.Login = null;
+        _loggedIn = false;
+        await LocalStorage.RemoveAsync("user");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnInitializedAsync();
+
+        if (!_loggedIn && firstRender)
+        {
+            _model.Login = await LocalStorage.GetStringAsync("user");
+            _loggedIn = !string.IsNullOrEmpty(_model.Login);
+
+            StateHasChanged();
+        }
+    }
+}

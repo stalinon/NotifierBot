@@ -8,5 +8,5 @@ public interface IHasId
     /// <summary>
     ///     Идентификатор записи в БД
     /// </summary>
-    long Id { get; }
+    long Id { get; set; }
 }

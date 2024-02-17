@@ -88,7 +88,7 @@ internal abstract class DataManager<TEntity, TModel> : IDataManager<TModel>
     /// <inheritdoc />
     public virtual async Task<TModel[]> ListAsync(long? limit = null, long? offset = null, CancellationToken cancellationToken = default)
     {
-        IQueryable<TEntity> query = RepositorySelector(_database).CreateQuery().OrderByDescending(e => e.Id);
+        IQueryable<TEntity> query = RepositorySelector(_database).CreateQuery().OrderBy(e => e.Id);
         if (offset.HasValue)
         {
             query = query.Skip((int)offset.Value);
@@ -101,6 +101,12 @@ internal abstract class DataManager<TEntity, TModel> : IDataManager<TModel>
 
         var list = await query.ToArrayAsync(cancellationToken);
         return _mapper.Map(list);
+    }
+
+    /// <inheritdoc />
+    public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+    {
+        return await RepositorySelector(_database).CreateQuery().CountAsync(cancellationToken);
     }
 
     private void SetAutomaticProps(TEntity entity)

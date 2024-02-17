@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\NotifierBot.Infastructure\NotifierBot.Infrastructure.Maintenance\NotifierBot.Infrastructure.Maintenance.csproj" />
+    </ItemGroup>
+
 </Project>

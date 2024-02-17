@@ -12,19 +12,19 @@ internal abstract class Repository<TEntity> : IRepository<TEntity>
 {
     private DbContext DbContext { get; }
 
-    private readonly DbSet<TEntity> _dbSet;
+    protected DbSet<TEntity> DbSet;
 
     /// <inheritdoc cref="Repository{TEntity}"/>
     protected Repository(DbContext dbContext)
     {
         DbContext = dbContext;
-        _dbSet = dbContext.Set<TEntity>();
+        DbSet = dbContext.Set<TEntity>();
     }
 
     /// <inheritdoc />
     public virtual IQueryable<TEntity> CreateQuery(Expression<Func<TEntity, bool>>? filter = null) => filter == null
-        ? _dbSet.AsQueryable()
-        : _dbSet.AsQueryable().Where(filter);
+        ? DbSet.AsQueryable()
+        : DbSet.AsQueryable().Where(filter);
 
     /// <inheritdoc />
     public virtual async Task<TEntity[]> GetAllAsync(
@@ -59,7 +59,7 @@ internal abstract class Repository<TEntity> : IRepository<TEntity>
             timestamped.SetLifecycle();
         }
         
-        await _dbSet.AddAsync(entity, cancellationToken);
+        await DbSet.AddAsync(entity, cancellationToken);
     }
 
     /// <inheritdoc />
@@ -74,18 +74,18 @@ internal abstract class Repository<TEntity> : IRepository<TEntity>
             }
         }
         
-        await _dbSet.AddRangeAsync(hasIds, cancellationToken);
+        await DbSet.AddRangeAsync(hasIds, cancellationToken);
     }
 
     /// <inheritdoc />
-    public virtual void Remove(TEntity entity) => _dbSet.Remove(entity);
+    public virtual void Remove(TEntity entity) => DbSet.Remove(entity);
 
     /// <inheritdoc />
-    public virtual void RemoveRange(TEntity[] entities) => _dbSet.RemoveRange(entities);
+    public virtual void RemoveRange(TEntity[] entities) => DbSet.RemoveRange(entities);
 
     /// <inheritdoc />
     public virtual IQueryable<TEntity> NoTracking() =>
-        _dbSet.AsNoTracking();
+        DbSet.AsNoTracking();
 
     /// <inheritdoc />
     public virtual async Task SaveChangesAsync(CancellationToken cancellationToken = default) =>

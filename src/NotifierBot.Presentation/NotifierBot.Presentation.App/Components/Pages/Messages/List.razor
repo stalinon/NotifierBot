@@ -1,0 +1,48 @@
+﻿@page "/messages/list"
+@using NotifierBot.Business.Services.DataManagement
+@using NotifierBot.Infrastructure.Models.Api
+@using NotifierBot.Infrastructure.Models.Enums
+@inject IDataManagementFacade DataManager
+
+<PageTitle>Сообщения</PageTitle>
+
+<MudDataGrid bind-RowsPerPage="@_limit" CurrentPage="@_currentPage" ServerData="@(new Func<GridState<Message>, Task<GridData<Message>>>(LoadData))">
+    <Columns>
+        <PropertyColumn T="Message" TProperty="long" Property="@(x => x.Id)" Title="Id" />
+        <PropertyColumn T="Message" TProperty="long" Property="@(x => x.SenderId)" Title="Sender" />
+        <PropertyColumn T="Message" TProperty="long" Property="@(x => x.RecipientId)" Title="Recipient" />
+        <TemplateColumn T="Message">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudTextField T="string" ReadOnly Variant="Variant.Text" Text="@context.Item.Text" Lines="5" Disabled />
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+        <PropertyColumn T="Message" TProperty="DateTime" Property="@(x => x.Created)" Title="Created" />
+        <PropertyColumn T="Message" TProperty="DateTime" Property="@(x => x.Updated)" Title="Updated" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Message" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private readonly int _limit = 30;
+    private int _currentPage = 1;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private async Task<GridData<Message>> LoadData(GridState<Message> data)
+    {
+        var recipients = await DataManager.Messages.ListAsync(data.PageSize, (data.Page - 1) * _limit);
+        var total = await DataManager.Messages.CountAsync();
+        return new GridData<Message>
+        {
+            Items = recipients,
+            TotalItems = total
+        };
+    }
+}

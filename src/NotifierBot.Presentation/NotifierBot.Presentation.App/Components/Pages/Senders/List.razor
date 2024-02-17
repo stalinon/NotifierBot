@@ -1,0 +1,40 @@
+﻿@page "/senders/list"
+@using NotifierBot.Infrastructure.Models.Api
+@using NotifierBot.Business.Services.DataManagement
+@inject IDataManagementFacade DataManager
+
+<PageTitle>Отправители</PageTitle>
+
+<MudDataGrid bind-RowsPerPage="@_limit" CurrentPage="@_currentPage" ServerData="@(new Func<GridState<Sender>, Task<GridData<Sender>>>(LoadData))">
+    <Columns>
+        <PropertyColumn T="Sender" TProperty="long" Property="@(x => x.Id)" Title="Id" />
+        <PropertyColumn T="Sender" TProperty="string" Property="@(x => x.Name)" Title="Name" />
+        <PropertyColumn T="Sender" TProperty="string" Property="@(x => x.Type.ToString())" Title="Type" />
+        <PropertyColumn T="Sender" TProperty="DateTime" Property="@(x => x.Created)" Title="Created" />
+        <PropertyColumn T="Sender" TProperty="DateTime" Property="@(x => x.Updated)" Title="Updated" />
+    </Columns>
+    <PagerContent>
+        <MudDataGridPager T="Sender" />
+    </PagerContent>
+</MudDataGrid>
+
+@code {
+    private readonly int _limit = 30;
+    private int _currentPage = 1;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+    }
+
+    private async Task<GridData<Sender>> LoadData(GridState<Sender> data)
+    {
+        var senders = await DataManager.Senders.ListAsync(data.PageSize, (data.Page - 1) * _limit);
+        var total = await DataManager.Senders.CountAsync();
+        return new GridData<Sender>
+        {
+            Items = senders,
+            TotalItems = total
+        };
+    }
+}
