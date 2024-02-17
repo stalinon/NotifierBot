@@ -7,6 +7,7 @@ using NotifierBot.Data.Repositories;
 using NotifierBot.Infrastructure.Maintenance.Configuration;
 using NotifierBot.Infrastructure.Maintenance.Exceptions;
 using Quartz;
+using IScheduler = NotifierBot.Business.Services.IScheduler;
 
 namespace NotifierBot.Business.Impl.Services.DataManagement;
 
@@ -14,12 +15,17 @@ namespace NotifierBot.Business.Impl.Services.DataManagement;
 internal sealed class ScheduleManager : DataManager<ScheduleEntity, Infrastructure.Models.Api.Schedule>, IScheduleManager
 {
     private readonly IDataAccessFacade _database;
+    private readonly IScheduler _scheduler;
 
     /// <inheritdoc cref="ScheduleManager" />
-    public ScheduleManager(IDataAccessFacade database) : base(new ScheduleMapper(), database)
+    public ScheduleManager(IDataAccessFacade database, IScheduler scheduler) : base(new ScheduleMapper(), database)
     {
         _database = database;
+        _scheduler = scheduler;
     }
+
+    /// <inheritdoc />
+    protected override Func<IDataAccessFacade, IRepository<ScheduleEntity>> RepositorySelector => d => d.Schedules;
 
     /// <inheritdoc />
     public async Task<Infrastructure.Models.Api.Schedule?> ReadAsync(IScheduleSettings scheduleSettings, CancellationToken cancellationToken)
@@ -33,27 +39,31 @@ internal sealed class ScheduleManager : DataManager<ScheduleEntity, Infrastructu
     public async Task<Infrastructure.Models.Api.Schedule> DeleteAsync(IScheduleSettings scheduleSettings, CancellationToken cancellationToken)
     {
         var entity = await GetScheduleBySettingsAsync(scheduleSettings, cancellationToken);
+        await _scheduler.UnscheduleMessageAsync(scheduleSettings, cancellationToken);
 
         return await base.DeleteAsync(entity.Id, cancellationToken);
     }
-
-    /// <inheritdoc />
-    protected override Func<IDataAccessFacade, IRepository<ScheduleEntity>> RepositorySelector => d => d.Schedules;
 
     /// <inheritdoc />
     public override async Task<Infrastructure.Models.Api.Schedule> CreateAsync(Infrastructure.Models.Api.Schedule model, CancellationToken cancellationToken)
     {
         await ValidateScheduleAsync(model, cancellationToken);
 
-        return await base.CreateAsync(model, cancellationToken);
+        var schedule = await base.CreateAsync(model, cancellationToken);
+        await _scheduler.ScheduleMessageAsync(schedule, cancellationToken);
+        
+        return schedule;
     }
 
     /// <inheritdoc />
     public override async Task<Infrastructure.Models.Api.Schedule> UpdateAsync(Infrastructure.Models.Api.Schedule model, CancellationToken cancellationToken)
     {
         await ValidateScheduleAsync(model, cancellationToken);
+
+        var schedule = await base.CreateAsync(model, cancellationToken);
+        await _scheduler.RescheduleMessageAsync(schedule, schedule.CronExpression, cancellationToken);
         
-        return await base.UpdateAsync(model, cancellationToken);
+        return schedule;
     }
 
     private async Task ValidateScheduleAsync(Infrastructure.Models.Api.Schedule model, CancellationToken cancellationToken)
