@@ -1,0 +1,43 @@
+version: "3.3"
+
+services:
+  notifier:
+    build:
+      context: .
+      dockerfile: src/NotifierBot.Presentation/NotifierBot.Presentation.App/Dockerfile
+    depends_on:
+      - postgres
+    container_name: notifier
+    restart: always
+    image: ${DOCKER_REGISTRY-}/notifier
+    environment:
+      - name=Host=postgres;Port=5432;Database=notifier;User Id=postgres;Password=${POSTGRES_PASSWORD};Include Error Detail=true;Pooling=false;Timeout=300;Command Timeout=300
+    ports:
+      - "8080:5118"
+    networks:
+      - net
+
+  postgres:
+    image: postgres:16
+    shm_size: 1g
+    container_name: database
+    command: docker-entrypoint.sh -c 'max_connections=1000'
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - PGUSER=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ./var/postgres:/var/lib/postgresql/data
+    ports:
+      - "35432:5432"
+    networks:
+      - net
+
+networks:
+  net: {}

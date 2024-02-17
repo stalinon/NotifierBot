@@ -1,4 +1,6 @@
-﻿namespace NotifierBot.Infrastructure.Maintenance.Configuration;
+﻿using NotifierBot.Infrastructure.Maintenance.Enums;
+
+namespace NotifierBot.Infrastructure.Maintenance.Configuration;
 
 /// <summary>
 ///     Настройки подключения к БД
@@ -9,4 +11,9 @@ public interface IDatabaseConfiguration
     ///     Строка подключения
     /// </summary>
     string ConnectionString { get; }
+    
+    /// <summary>
+    ///     Режим работы БД
+    /// </summary>
+    EnvironmentStatus DatabaseMode { get; }
 }
