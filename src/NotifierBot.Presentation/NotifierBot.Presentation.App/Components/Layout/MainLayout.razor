@@ -1,4 +1,9 @@
-﻿@inherits LayoutComponentBase
+﻿@using NotifierBot.Infrastructure.Maintenance.Configuration
+@using NotifierBot.Presentation.Models
+@using NotifierBot.Presentation.Services
+@using NotifierBot.Infrastructure.Maintenance
+@inherits LayoutComponentBase
+@inject ILocalStorage LocalStorage
 
 
 <MudThemeProvider IsDarkMode="true"/>
@@ -6,22 +11,76 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    <MudAppBar>
-        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(_ => DrawerToggle())" />
-    </MudAppBar>
-    <MudDrawer Open="false">
+    @if (_loggedIn)
+    {
+        <MudAppBar>
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(_ => DrawerToggle())"/>
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.End" OnClick="@(_ => Logout())"/>
+        </MudAppBar>
+        <MudDrawer Open="false">
 
-    </MudDrawer>
-    <MudMainContent Class="w-100">
-        @Body
-    </MudMainContent>
+        </MudDrawer>
+        <MudMainContent Class="w-100">
+            @Body
+        </MudMainContent>
+    }
+    else
+    {
+        <MudMainContent Class="w-100">
+            <MudCard Class="w-25" Style="margin: auto;">
+                <MudForm Model="@_model" @ref="@_form">
+                    <MudCardContent>
+                        <MudTextField Label="Email" Class="mt-3"
+                                      @bind-Value="@_model.Login" For="@(() => _model.Login)"/>
+                        <MudTextField Label="Password" Class="mt-3"
+                                      @bind-Value="@_model.Password" For="@(() => _model.Password)"/>
+                    </MudCardContent>
+                </MudForm>
+                <MudCardActions>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick=@(async () => await Login())>Login</MudButton>
+                </MudCardActions>
+            </MudCard>
+        </MudMainContent>
+    }
 </MudLayout>
 
 @code {
     bool _drawerOpen = true;
+    private bool _loggedIn;
+    private MudForm? _form;
+    private readonly ICredentials _credentials = Config.GetSuperAdminCredentials();
+    private readonly AuthModel _model = new();
 
     void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
+    }
+    
+    private async Task Login()
+    {
+        if (!string.IsNullOrEmpty(_model.Login) && !string.IsNullOrWhiteSpace(_model.Password)
+            && _model.Login == _credentials.Login && _model.Password == _credentials.Password)
+        {
+            _loggedIn = true;
+            _model.Password = null;
+            await LocalStorage.SaveStringAsync("user", _model.Login);
+        }
+    }
+
+    public async Task Logout()
+    {
+        _model.Login = null;
+        _loggedIn = false;
+        await LocalStorage.RemoveAsync("user");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await base.OnInitializedAsync();
+            _model.Login = await LocalStorage.GetStringAsync("user");
+            _loggedIn = !string.IsNullOrEmpty(_model.Login);
+        }
     }
 }

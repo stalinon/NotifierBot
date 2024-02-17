@@ -1,28 +1,28 @@
 using Microsoft.AspNetCore.Authorization;
 using MudBlazor.Services;
 using NotifierBot.Business.Impl;
+using NotifierBot.Infrastructure.Maintenance;
 using NotifierBot.Presentation.App.Components;
 using NotifierBot.Presentation.Impl;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.AddConsole();
-builder.Services.SetupBusinessLayer();
+builder.Services.SetupBusinessLayer().AddPresentationLayer();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddAuthService();
 builder.Services.AddMudServices();
 
 builder.Services.AddAuthentication(
         o =>
         {
-            o.DefaultScheme = "Basic";
-            o.DefaultChallengeScheme = "Basic";
+            o.DefaultScheme = Config.AUTH_SCHEME;
+            o.DefaultChallengeScheme = Config.AUTH_SCHEME;
         }
     )
     .AddCookie(
-        "Basic",
+        Config.AUTH_SCHEME,
         options => { }
     );
 
@@ -31,7 +31,7 @@ builder.Services.AddAuthorization(
     {
         options.DefaultPolicy = new AuthorizationPolicyBuilder()
             .RequireAuthenticatedUser()
-            .AddAuthenticationSchemes("Basic")
+            .AddAuthenticationSchemes(Config.AUTH_SCHEME)
             .Build();
     }
 );

@@ -13,5 +13,5 @@ public interface ICredentials
     /// <summary>
     ///     Пароль
     /// </summary>
-    string Password { get; }
+    string? Password { get; }
 }

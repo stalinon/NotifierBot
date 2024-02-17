@@ -12,8 +12,8 @@ public static class ServiceCollectionExtensions
     /// <summary>
     ///     Добавить сервисы авторизации
     /// </summary>
-    public static IServiceCollection AddAuthService(this IServiceCollection services)
+    public static IServiceCollection AddPresentationLayer(this IServiceCollection services)
     {
-        return services.AddScoped<IAuthService, AuthService>();
+        return services.AddScoped<ILocalStorage, LocalStorage>();
     }
 }

@@ -12,7 +12,7 @@ public class SuperAdminCredentials : ICredentials
     public string Login { get; }
 
     /// <inheritdoc />
-    public string Password { get; }
+    public string? Password { get; }
 
     /// <inheritdoc cref="SuperAdminCredentials" />
     public SuperAdminCredentials()

@@ -1,4 +1,5 @@
-﻿using NotifierBot.Infrastructure.Maintenance.Configuration;
+﻿using Microsoft.AspNetCore.Authentication.Cookies;
+using NotifierBot.Infrastructure.Maintenance.Configuration;
 using NotifierBot.Infrastructure.Maintenance.Configuration.Impl;
 
 namespace NotifierBot.Infrastructure.Maintenance;
@@ -8,6 +9,11 @@ namespace NotifierBot.Infrastructure.Maintenance;
 /// </summary>
 public static class Config
 {
+    /// <summary>
+    ///     Схема аутентификации
+    /// </summary>
+    public const string AUTH_SCHEME = CookieAuthenticationDefaults.AuthenticationScheme;
+    
     /// <summary>
     ///     Получить конфигурацию БД
     /// </summary>
