@@ -68,7 +68,7 @@
 
     private async Task<GridData<Message>> LoadData(GridState<Message> data)
     {
-        var recipients = await DataManager.Messages.ListAsync(data.PageSize, (data.Page - 1) * _limit);
+        var recipients = await DataManager.Messages.ListAsync(data.PageSize, (data.Page - 1) * data.PageSize);
         var total = await DataManager.Messages.CountAsync();
         return new GridData<Message>
         {

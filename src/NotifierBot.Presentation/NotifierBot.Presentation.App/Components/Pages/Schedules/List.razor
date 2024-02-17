@@ -47,7 +47,7 @@
 
     private async Task<GridData<Schedule>> LoadData(GridState<Schedule> data)
     {
-        var recipients = await DataManager.Schedules.ListAsync(data.PageSize, (data.Page - 1) * _limit);
+        var recipients = await DataManager.Schedules.ListAsync(data.PageSize, (data.Page - 1) * data.PageSize);
         var total = await DataManager.Schedules.CountAsync();
         return new GridData<Schedule>
         {
