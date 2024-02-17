@@ -26,7 +26,7 @@ internal static class EnvironmentDataGenerator
         }
         
         var senders = new List<SenderEntity>();
-        for (var i = 0; i < Limit; i++)
+        for (var i = 1; i < Limit; i++)
         {
             var sender = new SenderEntity
             {
@@ -42,7 +42,7 @@ internal static class EnvironmentDataGenerator
         }
         
         var recipients = new List<RecipientEntity>();
-        for (var i = 0; i < Limit; i++)
+        for (var i = 1; i < Limit; i++)
         {
             var recipient = new RecipientEntity
             {
@@ -58,7 +58,7 @@ internal static class EnvironmentDataGenerator
         }
         
         var messages = new List<MessageEntity>();
-        for (var i = 0; i < Limit; i++)
+        for (var i = 1; i < Limit; i++)
         {
             var randomSender = senders.GetRandomElement();
             var randomRecipient = recipients.GetRandomElement();
@@ -82,7 +82,7 @@ internal static class EnvironmentDataGenerator
         }
         
         var schedules = new List<ScheduleEntity>();
-        for (var i = 0; i < Limit; i++)
+        for (var i = 1; i < Limit; i++)
         {
             var randomMessage = messages.GetRandomElement();
             

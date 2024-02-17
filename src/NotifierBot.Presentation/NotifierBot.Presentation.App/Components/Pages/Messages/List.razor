@@ -3,14 +3,38 @@
 @using NotifierBot.Infrastructure.Models.Api
 @using NotifierBot.Infrastructure.Models.Enums
 @inject IDataManagementFacade DataManager
+@inject NavigationManager Nav
 
 <PageTitle>Сообщения</PageTitle>
 
+<MudStack Class="my-2">    
+    <MudButton Color="Color.Inherit" OnClick="@(_ => Nav.NavigateTo($"/messages/0"))">
+        <MudIcon Icon="@Icons.Material.Filled.Create" Color="Color.Inherit" />
+        &nbsp; &nbsp;
+        Создать
+    </MudButton>
+</MudStack>
 <MudDataGrid bind-RowsPerPage="@_limit" CurrentPage="@_currentPage" ServerData="@(new Func<GridState<Message>, Task<GridData<Message>>>(LoadData))">
     <Columns>
         <PropertyColumn T="Message" TProperty="long" Property="@(x => x.Id)" Title="Id" />
-        <PropertyColumn T="Message" TProperty="long" Property="@(x => x.SenderId)" Title="Sender" />
-        <PropertyColumn T="Message" TProperty="long" Property="@(x => x.RecipientId)" Title="Recipient" />
+        <TemplateColumn T="Message" Title="Sender">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudButton Color="Color.Transparent" OnClick="@(_ => Nav.NavigateTo($"/senders/{context.Item.SenderId}"))">
+                        @context.Item.SenderId
+                    </MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
+        <TemplateColumn T="Message" Title="Recipient">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudButton Color="Color.Transparent" OnClick="@(_ => Nav.NavigateTo($"/recipients/{context.Item.RecipientId}"))">
+                        @context.Item.RecipientId
+                    </MudButton>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
         <TemplateColumn T="Message">
             <CellTemplate>
                 <MudStack Row>
@@ -20,6 +44,13 @@
         </TemplateColumn>
         <PropertyColumn T="Message" TProperty="DateTime" Property="@(x => x.Created)" Title="Created" />
         <PropertyColumn T="Message" TProperty="DateTime" Property="@(x => x.Updated)" Title="Updated" />
+        <TemplateColumn T="Message">
+            <CellTemplate>
+                <MudStack Row>
+                    <MudIconButton Icon="@Icons.Material.Filled.FileOpen" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(_ => Nav.NavigateTo($"/messages/{context.Item.Id}"))"/>
+                </MudStack>
+            </CellTemplate>
+        </TemplateColumn>
     </Columns>
     <PagerContent>
         <MudDataGridPager T="Message" />
