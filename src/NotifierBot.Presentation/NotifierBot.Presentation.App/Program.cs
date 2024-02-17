@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using MudBlazor.Services;
 using NotifierBot.Business.Impl;
+using NotifierBot.Data.Impl;
 using NotifierBot.Infrastructure.Maintenance;
 using NotifierBot.Presentation.App.Components;
 using NotifierBot.Presentation.Impl;
@@ -8,11 +9,13 @@ using NotifierBot.Presentation.Impl;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.AddConsole();
-builder.Services.SetupBusinessLayer().AddPresentationLayer();
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddMudServices();
+
+builder.Services.SetupBusinessLayer()
+                .AddPresentationLayer()
+                .AddHttpContextAccessor()
+                .AddMudServices()
+                .AddRazorComponents()
+                .AddInteractiveServerComponents();
 
 builder.Services.AddAuthentication(
         o =>
@@ -36,6 +39,8 @@ builder.Services.AddAuthorization(
     }
 );
 
+builder.Services.BuildServiceProvider().ApplyMigrations();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -53,6 +58,6 @@ app.UseStaticFiles();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+   .AddInteractiveServerRenderMode();
 
 app.Run();

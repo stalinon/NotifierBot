@@ -18,8 +18,7 @@ public static class ServiceCollectionExtensions
     /// </summary>
     public static IServiceCollection SetupBusinessLayer(this IServiceCollection services)
     {
-        const EnvironmentStatus status = EnvironmentStatus.USE_MOCK;
-        services.SetupDataAccessLayer(status);
+        services.SetupDataAccessLayer();
         
         services.AddSingleton<ISenderManager, SenderManager>();
         services.AddSingleton<IRecipientManager, RecipientManager>();
