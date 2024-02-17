@@ -15,12 +15,20 @@
     {
         <MudAppBar>
             <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@(_ => DrawerToggle())"/>
-            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" Edge="Edge.End" OnClick="@(_ => Logout())"/>
+            <MudSpacer />
+            <MudText Typo="Typo.h6">Notifier</MudText>
+            <MudSpacer />
+            <MudIconButton Icon="@Icons.Material.Filled.Logout" Color="Color.Inherit" OnClick="@(_ => Logout())"/>
         </MudAppBar>
-        <MudDrawer Open="false">
-
+        <MudDrawer @bind-Open="@_drawerOpen" ClipMode="@DrawerClipMode.Docked" Breakpoint="@Breakpoint.Lg" PreserveOpenState="@false" Elevation="1" Variant="@DrawerVariant.Mini">
+            <MudNavMenu>
+                <MudNavLink Href="/senders/list" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Send">Отправители</MudNavLink>
+                <MudNavLink Href="/recipients/list" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.CallReceived">Получатели</MudNavLink>
+                <MudNavLink Href="/messages/list" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Message">Сообщения</MudNavLink>
+                <MudNavLink Href="/schedules/list" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Schedule">Расписания</MudNavLink>
+            </MudNavMenu>
         </MudDrawer>
-        <MudMainContent Class="w-100">
+        <MudMainContent>
             @Body
         </MudMainContent>
     }
@@ -45,13 +53,13 @@
 </MudLayout>
 
 @code {
-    bool _drawerOpen = true;
+    bool _drawerOpen;
     private bool _loggedIn;
     private MudForm? _form;
     private readonly ICredentials _credentials = Config.GetSuperAdminCredentials();
     private readonly AuthModel _model = new();
 
-    void DrawerToggle()
+    private void DrawerToggle()
     {
         _drawerOpen = !_drawerOpen;
     }
@@ -64,6 +72,7 @@
             _loggedIn = true;
             _model.Password = null;
             await LocalStorage.SaveStringAsync("user", _model.Login);
+            StateHasChanged();
         }
     }
 
@@ -76,11 +85,14 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        await base.OnInitializedAsync();
+
+        if (!_loggedIn && firstRender)
         {
-            await base.OnInitializedAsync();
             _model.Login = await LocalStorage.GetStringAsync("user");
             _loggedIn = !string.IsNullOrEmpty(_model.Login);
+
+            StateHasChanged();
         }
     }
 }

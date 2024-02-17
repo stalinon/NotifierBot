@@ -41,4 +41,10 @@ public interface IDataManager<TModel>
         long? limit = null,
         long? offset = null,
         CancellationToken cancellationToken = default);
+
+    /// <summary>
+    ///     Получить полное количество строк
+    /// </summary>
+    Task<int> CountAsync(
+        CancellationToken cancellationToken = default);
 }
