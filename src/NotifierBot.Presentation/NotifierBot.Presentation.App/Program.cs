@@ -3,6 +3,7 @@ using MudBlazor.Services;
 using NotifierBot.Business.Impl;
 using NotifierBot.Data.Impl;
 using NotifierBot.Infrastructure.Maintenance;
+using NotifierBot.Infrastructure.Maintenance.Services;
 using NotifierBot.Presentation.App.Components;
 using NotifierBot.Presentation.Impl;
 
@@ -55,6 +56,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseStaticFiles();
+app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseAntiforgery();
 
 app.MapRazorComponents<App>()

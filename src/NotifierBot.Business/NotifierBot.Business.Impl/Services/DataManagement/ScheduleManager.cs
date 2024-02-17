@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using Microsoft.Extensions.DependencyInjection;
 using NotifierBot.Business.Impl.Mapping;
 using NotifierBot.Business.Services.DataManagement;
 using NotifierBot.Data;
@@ -15,13 +16,15 @@ namespace NotifierBot.Business.Impl.Services.DataManagement;
 internal sealed class ScheduleManager : DataManager<ScheduleEntity, Infrastructure.Models.Api.Schedule>, IScheduleManager
 {
     private readonly IDataAccessFacade _database;
-    private readonly IScheduler _scheduler;
+    private readonly IServiceProvider _serviceProvider;
 
-    /// <inheritdoc cref="ScheduleManager" />
-    public ScheduleManager(IDataAccessFacade database, IScheduler scheduler) : base(new ScheduleMapper(), database)
+    private IScheduler Scheduler => _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IScheduler>();
+
+    /// <inheritdoc cref="Scheduler" />
+    public ScheduleManager(IDataAccessFacade database, IServiceProvider serviceProvider) : base(new ScheduleMapper(), database)
     {
         _database = database;
-        _scheduler = scheduler;
+        _serviceProvider = serviceProvider;
     }
 
     /// <inheritdoc />
@@ -39,7 +42,8 @@ internal sealed class ScheduleManager : DataManager<ScheduleEntity, Infrastructu
     public async Task<Infrastructure.Models.Api.Schedule> DeleteAsync(IScheduleSettings scheduleSettings, CancellationToken cancellationToken)
     {
         var entity = await GetScheduleBySettingsAsync(scheduleSettings, cancellationToken);
-        await _scheduler.UnscheduleMessageAsync(scheduleSettings, cancellationToken);
+
+        await Scheduler.UnscheduleMessageAsync(entity, cancellationToken);
 
         return await base.DeleteAsync(entity.Id, cancellationToken);
     }
@@ -50,8 +54,7 @@ internal sealed class ScheduleManager : DataManager<ScheduleEntity, Infrastructu
         await ValidateScheduleAsync(model, cancellationToken);
 
         var schedule = await base.CreateAsync(model, cancellationToken);
-        await _scheduler.ScheduleMessageAsync(schedule, cancellationToken);
-        
+        await Scheduler.ScheduleMessageAsync(schedule, cancellationToken);
         return schedule;
     }
 
@@ -60,10 +63,14 @@ internal sealed class ScheduleManager : DataManager<ScheduleEntity, Infrastructu
     {
         await ValidateScheduleAsync(model, cancellationToken);
 
-        var schedule = await base.CreateAsync(model, cancellationToken);
-        await _scheduler.RescheduleMessageAsync(schedule, schedule.CronExpression, cancellationToken);
+        var schedule = await base.ReadAsync(model.Id, cancellationToken);
+        if (schedule == null)
+        {
+            throw new ErrorException(HttpStatusCode.NotFound, $"Не найдено расписание #{model.Id}");
+        }
         
-        return schedule;
+        await Scheduler.RescheduleMessageAsync(model, schedule.CronExpression, cancellationToken);
+        return await base.UpdateAsync(model, cancellationToken);
     }
 
     private async Task ValidateScheduleAsync(Infrastructure.Models.Api.Schedule model, CancellationToken cancellationToken)

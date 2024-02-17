@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
         switch (configuration.DatabaseMode)
         {
             case EnvironmentStatus.USE_DATABASE:
-                services.AddDbContext<DatabaseContext>(option => option.UseNpgsql(configuration.ConnectionString))
+                services.AddDbContext<DatabaseContext>()
                         .AddScoped<IMessageRepository, MessageRepository>()
                         .AddScoped<IScheduleRepository, ScheduleRepository>()
                         .AddScoped<IRecipientRepository, RecipientRepository>()
@@ -64,7 +64,7 @@ public static class ServiceCollectionExtensions
             db.Database.Migrate();
             db.Database.SetCommandTimeout(null);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             throw new ErrorException(HttpStatusCode.InternalServerError, "Error applying database migrations");
         }

@@ -8,7 +8,7 @@ namespace NotifierBot.Data.Impl.Repositories;
 internal sealed class ScheduleRepository : Repository<ScheduleEntity>, IScheduleRepository
 {
     /// <inheritdoc cref="ScheduleRepository" />
-    public ScheduleRepository(DbContext dbContext) : base(dbContext)
+    public ScheduleRepository(DatabaseContext dbContext) : base(dbContext)
     {
     }
 }

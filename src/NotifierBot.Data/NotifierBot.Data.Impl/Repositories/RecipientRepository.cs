@@ -8,7 +8,7 @@ namespace NotifierBot.Data.Impl.Repositories;
 internal sealed class RecipientRepository : Repository<RecipientEntity>, IRecipientRepository
 {
     /// <inheritdoc cref="RecipientRepository" />
-    public RecipientRepository(DbContext dbContext) : base(dbContext)
+    public RecipientRepository(DatabaseContext dbContext) : base(dbContext)
     {
     }
 }

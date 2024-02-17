@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NotifierBot.Data.Entities;
+using NotifierBot.Infrastructure.Maintenance;
+using Npgsql;
 
 namespace NotifierBot.Data.Impl;
 
@@ -27,7 +29,17 @@ internal sealed class DatabaseContext : DbContext
     ///     Расписания
     /// </summary>
     public DbSet<ScheduleEntity> Schedules { get; set; } = default!;
-    
+
+    /// <inheritdoc/>
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        var configuration = Config.GetDatabaseConfiguration();
+        optionsBuilder.UseNpgsql(configuration.ConnectionString);
+#pragma warning disable CS0618 // Type or member is obsolete
+        NpgsqlConnection.GlobalTypeMapper.EnableDynamicJson();
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
     /// <inheritdoc/>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

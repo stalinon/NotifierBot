@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IScheduleManager, ScheduleManager>();
         services.AddSingleton<IDataManagementFacade, DataManagementFacade>();
         services.AddSingleton<ISenderFactory, SenderFactory>();
-        services.AddSingleton<IScheduler, Scheduler>();
+        services.AddScoped<IScheduler, Scheduler>();
         return services;
     }
 }
