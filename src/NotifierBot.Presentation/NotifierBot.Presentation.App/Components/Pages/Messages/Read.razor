@@ -8,66 +8,69 @@
 
 <PageTitle>Сообщения</PageTitle>
 
-<MudPaper Class="pa-4">
-    <MudButton aria-label="back" Href="/messages/list">
-        <MudIcon Icon="@Icons.Material.Filled.ArrowBack"></MudIcon>
-        &nbsp; &nbsp;
-        Перейти к списку сообщений
-    </MudButton>
-    <MudForm @ref="_form">
-        <MudTextField T="long" Label="Идентификатор" Disabled @bind-Value="@_model.Id" For="@(() => _model.Id)"/>
-        <MudTextField T="long" Label="Идентификатор отправителя" @bind-Value="@_model.SenderId" For="@(() => _model.SenderId)" />
-        <MudTextField T="long" Label="Идентификатор получателя" @bind-Value="@_model.RecipientId" For="@(() => _model.RecipientId)" />
-        
-        <MudTextField T="string" Label="Текст сообщения" @bind-Value="@_model.Text" For="@(() => _model.Text)" Lines="10" />
-        
-        <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
-            <ButtonTemplate>
-                <MudFab HtmlTag="label"
-                        Color="Color.Success"
-                        Icon="@Icons.Material.Filled.AttachFile"
-                        Label="Загрузить файл"
-                        for="@context.Id" />
-            </ButtonTemplate>
-        </MudFileUpload>
-        
-        @if (_model is { AttachmentType: not null,Attachment: not null })
-        {
-            @switch (_model.AttachmentType)
+@if (_model != null)
+{
+    <MudPaper Class="pa-4">
+        <MudButton aria-label="back" Href="/messages/list">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack"></MudIcon>
+            &nbsp; &nbsp;
+            Перейти к списку сообщений
+        </MudButton>
+        <MudForm @ref="_form">
+            <MudTextField T="long" Label="Идентификатор" Disabled @bind-Value="@_model.Id" For="@(() => _model.Id)"/>
+            <MudTextField T="long" Label="Идентификатор отправителя" @bind-Value="@_model.SenderId" For="@(() => _model.SenderId)"/>
+            <MudTextField T="long" Label="Идентификатор получателя" @bind-Value="@_model.RecipientId" For="@(() => _model.RecipientId)"/>
+
+            <MudTextField T="string" Label="Текст сообщения" @bind-Value="@_model.Text" For="@(() => _model.Text)" Lines="10"/>
+
+            <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles">
+                <ButtonTemplate>
+                    <MudFab HtmlTag="label"
+                            Color="Color.Success"
+                            Icon="@Icons.Material.Filled.AttachFile"
+                            Label="Загрузить файл"
+                            for="@context.Id"/>
+                </ButtonTemplate>
+            </MudFileUpload>
+
+            @if (_model is { AttachmentType: not null,Attachment: not null })
             {
-                case AttachmentType.PHOTO:
-                    <MudItem xs="12" md="8" Class="d-flex justify-center align-center">
-                        <MudImage ObjectFit="ObjectFit.Contain" Src="@GetImageSrc()" Elevation="25" Class="rounded-lg"/>
-                    </MudItem>
-                    break;
-                case AttachmentType.FILE:
-                    <MudList>
-                        <MudListItem Icon="@Icons.Material.Filled.AttachFile">
-                            <code>@_model.Attachment.Length bytes</code>
-                        </MudListItem>
-                    </MudList>
-                    break;
+                @switch (_model.AttachmentType)
+                {
+                    case AttachmentType.PHOTO:
+                        <MudItem xs="12" md="8" Class="d-flex justify-center align-center">
+                            <MudImage ObjectFit="ObjectFit.Contain" Src="@GetImageSrc()" Elevation="25" Class="rounded-lg"/>
+                        </MudItem>
+                        break;
+                    case AttachmentType.FILE:
+                        <MudList>
+                            <MudListItem Icon="@Icons.Material.Filled.AttachFile">
+                                <code>@_model.Attachment.Length bytes</code>
+                            </MudListItem>
+                        </MudList>
+                        break;
+                }
             }
-        }
-        
-        <MudTextField T="DateTime" Label="Дата создания" Disabled @bind-Value="@_model.Created" For="@(() => _model.Created)"/>
-        <MudTextField T="DateTime" Label="Дата обновления" Disabled @bind-Value="@_model.Updated" For="@(() => _model.Updated)"/>
-        <div class="d-flex align-center justify-space-between mt-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@SaveAsync">
-                <MudIcon Icon="@Icons.Material.Filled.Save"></MudIcon>
-                &nbsp; &nbsp;
-                Сохранить
-            </MudButton>
-        </div>
-    </MudForm>
-</MudPaper>
+
+            <MudTextField T="DateTime" Label="Дата создания" Disabled @bind-Value="@_model.Created" For="@(() => _model.Created)"/>
+            <MudTextField T="DateTime" Label="Дата обновления" Disabled @bind-Value="@_model.Updated" For="@(() => _model.Updated)"/>
+            <div class="d-flex align-center justify-space-between mt-4">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@SaveAsync">
+                    <MudIcon Icon="@Icons.Material.Filled.Save"></MudIcon>
+                    &nbsp; &nbsp;
+                    Сохранить
+                </MudButton>
+            </div>
+        </MudForm>
+    </MudPaper>
+}
 
 @code {
     
     [Parameter]
     public string Id { get; set; } = default!;
 
-    private Message _model = null!;
+    private Message? _model;
     private MudForm? _form;
 
     protected override async Task OnInitializedAsync()

@@ -8,40 +8,43 @@
 
 <PageTitle>Получатели</PageTitle>
 
-<MudPaper Class="pa-4">
-    <MudButton aria-label="back" Href="/recipients/list">
-        <MudIcon Icon="@Icons.Material.Filled.ArrowBack"></MudIcon>
-        &nbsp; &nbsp;
-        Перейти к списку получателей
-    </MudButton>
-    <MudForm @ref="_form">
-        <MudTextField T="long" Label="Идентификатор" Disabled @bind-Value="@_model.Id" For="@(() => _model.Id)"/>
-        <MudTextField T="string" Label="Внешний идентификатор" @bind-Value="@_model.ExternalIdentifier" For="@(() => _model.ExternalIdentifier)"/>
-        <MudTextField T="string" Label="Название" @bind-Value="@_model.Name" For="@(() => _model.Name)"/>
-        <MudSelect T="RecipientType" Label="Тип" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_model.Type" For="@(() => _model.Type)">
-            @foreach (var item in Enum.GetValues<RecipientType>())
-            {
-                <MudSelectItem Value="@item"/>
-            }
-        </MudSelect>
-        <MudTextField T="DateTime" Label="Дата создания" Disabled @bind-Value="@_model.Created" For="@(() => _model.Created)"/>
-        <MudTextField T="DateTime" Label="Дата обновления" Disabled @bind-Value="@_model.Updated" For="@(() => _model.Updated)"/>
-        <div class="d-flex align-center justify-space-between mt-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@SaveAsync">
-                <MudIcon Icon="@Icons.Material.Filled.Save"></MudIcon>
-                &nbsp; &nbsp;
-                Сохранить
-            </MudButton>
-        </div>
-    </MudForm>
-</MudPaper>
+@if (_model != null)
+{
+    <MudPaper Class="pa-4">
+        <MudButton aria-label="back" Href="/recipients/list">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack"></MudIcon>
+            &nbsp; &nbsp;
+            Перейти к списку получателей
+        </MudButton>
+        <MudForm @ref="_form">
+            <MudTextField T="long" Label="Идентификатор" Disabled @bind-Value="@_model.Id" For="@(() => _model.Id)"/>
+            <MudTextField T="string" Label="Внешний идентификатор" @bind-Value="@_model.ExternalIdentifier" For="@(() => _model.ExternalIdentifier)"/>
+            <MudTextField T="string" Label="Название" @bind-Value="@_model.Name" For="@(() => _model.Name)"/>
+            <MudSelect T="RecipientType" Label="Тип" AnchorOrigin="Origin.BottomCenter" @bind-Value="@_model.Type" For="@(() => _model.Type)">
+                @foreach (var item in Enum.GetValues<RecipientType>())
+                {
+                    <MudSelectItem Value="@item"/>
+                }
+            </MudSelect>
+            <MudTextField T="DateTime" Label="Дата создания" Disabled @bind-Value="@_model.Created" For="@(() => _model.Created)"/>
+            <MudTextField T="DateTime" Label="Дата обновления" Disabled @bind-Value="@_model.Updated" For="@(() => _model.Updated)"/>
+            <div class="d-flex align-center justify-space-between mt-4">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@SaveAsync">
+                    <MudIcon Icon="@Icons.Material.Filled.Save"></MudIcon>
+                    &nbsp; &nbsp;
+                    Сохранить
+                </MudButton>
+            </div>
+        </MudForm>
+    </MudPaper>
+}
 
 @code {
     
     [Parameter]
     public string Id { get; set; } = default!;
 
-    private Recipient _model = null!;
+    private Recipient? _model;
     private MudForm? _form;
 
     protected override async Task OnInitializedAsync()

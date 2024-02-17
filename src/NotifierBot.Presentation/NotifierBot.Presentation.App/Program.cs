@@ -40,7 +40,9 @@ builder.Services.AddAuthorization(
     }
 );
 
-builder.Services.BuildServiceProvider().ApplyMigrations();
+var serviceProvider = builder.Services.BuildServiceProvider();
+serviceProvider.ApplyMigrations();
+await serviceProvider.StartAllActiveSchedulesAsync();
 
 var app = builder.Build();
 

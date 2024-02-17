@@ -30,11 +30,12 @@ internal abstract class DataManager<TEntity, TModel> : IDataManager<TModel>
     /// <inheritdoc />
     public virtual async Task<TModel> CreateAsync(TModel model, CancellationToken cancellationToken)
     {
+        var db = RepositorySelector(_database);
         var entity = _mapper.Map(model);
 
         SetAutomaticProps(entity);
-        await RepositorySelector(_database).AddAsync(entity, cancellationToken);
-        await RepositorySelector(_database).SaveChangesAsync(cancellationToken);
+        await db.AddAsync(entity, cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
 
         return _mapper.Map(entity);
     }
@@ -55,7 +56,8 @@ internal abstract class DataManager<TEntity, TModel> : IDataManager<TModel>
     /// <inheritdoc />
     public virtual async Task<TModel> UpdateAsync(TModel model, CancellationToken cancellationToken)
     {
-        var entity = await RepositorySelector(_database).FirstOrDefaultAsync(e => e.Id == model.Id, cancellationToken);
+        var db = RepositorySelector(_database);
+        var entity = await db.FirstOrDefaultAsync(e => e.Id == model.Id, cancellationToken);
 
         if (entity == null)
         {
@@ -64,7 +66,7 @@ internal abstract class DataManager<TEntity, TModel> : IDataManager<TModel>
 
         SetAutomaticProps(entity);
         _ = _mapper.Map(model, entity);
-        await RepositorySelector(_database).SaveChangesAsync(cancellationToken);
+        await db.SaveChangesAsync(cancellationToken);
 
         return model;
     }
@@ -72,15 +74,16 @@ internal abstract class DataManager<TEntity, TModel> : IDataManager<TModel>
     /// <inheritdoc />
     public virtual async Task<TModel> DeleteAsync(long id, CancellationToken cancellationToken)
     {
-        var entity = await RepositorySelector(_database).FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
+        var db = RepositorySelector(_database);
+        var entity = await db.FirstOrDefaultAsync(e => e.Id == id, cancellationToken);
 
         if (entity == null)
         {
             throw new ErrorException(HttpStatusCode.NotFound, $"Сущность #{id} не была найдена.");
         }
 
-        RepositorySelector(_database).Remove(entity);
-        await RepositorySelector(_database).SaveChangesAsync(cancellationToken);
+        db.Remove(entity);
+        await db.SaveChangesAsync(cancellationToken);
 
         return _mapper.Map(entity);
     }

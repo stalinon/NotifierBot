@@ -8,35 +8,38 @@
 
 <PageTitle>Расписания</PageTitle>
 
-<MudPaper Class="pa-4">
-    <MudButton aria-label="back" Href="/schedules/list">
-        <MudIcon Icon="@Icons.Material.Filled.ArrowBack"></MudIcon>
-        &nbsp; &nbsp;
-        Перейти к списку расписаний
-    </MudButton>
-    <MudForm @ref="_form">
-        <MudTextField T="long" Label="Идентификатор" Disabled @bind-Value="@_model.Id" For="@(() => _model.Id)"/>
-        <MudTextField T="long" Label="Идентификатор сообщения" @bind-Value="@_model.MessageId" For="@(() => _model.MessageId)"/>
-        <MudTextField T="string" Label="Крона" @bind-Value="@_model.CronExpression" For="@(() => _model.CronExpression)"/>
-        <MudSwitch @bind-Value="@_model.IsActive" Color="Color.Primary" Label="Активный" />
-        <MudTextField T="DateTime" Label="Дата создания" Disabled @bind-Value="@_model.Created" For="@(() => _model.Created)"/>
-        <MudTextField T="DateTime" Label="Дата обновления" Disabled @bind-Value="@_model.Updated" For="@(() => _model.Updated)"/>
-        <div class="d-flex align-center justify-space-between mt-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@SaveAsync">
-                <MudIcon Icon="@Icons.Material.Filled.Save"></MudIcon>
-                &nbsp; &nbsp;
-                Сохранить
-            </MudButton>
-        </div>
-    </MudForm>
-</MudPaper>
+@if (_model != null)
+{
+    <MudPaper Class="pa-4">
+        <MudButton aria-label="back" Href="/schedules/list">
+            <MudIcon Icon="@Icons.Material.Filled.ArrowBack"></MudIcon>
+            &nbsp; &nbsp;
+            Перейти к списку расписаний
+        </MudButton>
+        <MudForm @ref="_form">
+            <MudTextField T="long" Label="Идентификатор" Disabled @bind-Value="@_model.Id" For="@(() => _model.Id)"/>
+            <MudTextField T="long" Label="Идентификатор сообщения" @bind-Value="@_model.MessageId" For="@(() => _model.MessageId)"/>
+            <MudTextField T="string" Label="Крона" @bind-Value="@_model.CronExpression" For="@(() => _model.CronExpression)"/>
+            <MudSwitch @bind-Value="@_model.IsActive" Color="Color.Primary" Label="Активный"/>
+            <MudTextField T="DateTime" Label="Дата создания" Disabled @bind-Value="@_model.Created" For="@(() => _model.Created)"/>
+            <MudTextField T="DateTime" Label="Дата обновления" Disabled @bind-Value="@_model.Updated" For="@(() => _model.Updated)"/>
+            <div class="d-flex align-center justify-space-between mt-4">
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@SaveAsync">
+                    <MudIcon Icon="@Icons.Material.Filled.Save"></MudIcon>
+                    &nbsp; &nbsp;
+                    Сохранить
+                </MudButton>
+            </div>
+        </MudForm>
+    </MudPaper>
+}
 
 @code {
     
     [Parameter]
     public string Id { get; set; } = default!;
 
-    private Schedule _model = null!;
+    private Schedule? _model;
     private MudForm? _form;
 
     protected override async Task OnInitializedAsync()

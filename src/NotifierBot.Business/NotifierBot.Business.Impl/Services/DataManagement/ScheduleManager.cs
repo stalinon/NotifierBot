@@ -68,9 +68,10 @@ internal sealed class ScheduleManager : DataManager<ScheduleEntity, Infrastructu
         {
             throw new ErrorException(HttpStatusCode.NotFound, $"Не найдено расписание #{model.Id}");
         }
-        
+
+        schedule = await base.UpdateAsync(model, cancellationToken);
         await Scheduler.RescheduleMessageAsync(model, schedule.CronExpression, cancellationToken);
-        return await base.UpdateAsync(model, cancellationToken);
+        return schedule;
     }
 
     private async Task ValidateScheduleAsync(Infrastructure.Models.Api.Schedule model, CancellationToken cancellationToken)

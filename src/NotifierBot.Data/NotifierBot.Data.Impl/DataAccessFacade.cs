@@ -6,27 +6,28 @@ namespace NotifierBot.Data.Impl;
 /// <inheritdoc cref="IDataAccessFacade" />
 internal sealed class DataAccessFacade : IDataAccessFacade
 {
+    private readonly IServiceProvider _serviceProvider;
+
     /// <inheritdoc cref="DataAccessFacade" />
     public DataAccessFacade(
         IServiceProvider serviceProvider)
     {
-        var scope = serviceProvider.CreateScope();
-        
-        Schedules = scope.ServiceProvider.GetRequiredService<IScheduleRepository>();
-        Messages = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
-        Senders = scope.ServiceProvider.GetRequiredService<ISenderRepository>();
-        Recipients = scope.ServiceProvider.GetRequiredService<IRecipientRepository>();
+        _serviceProvider = serviceProvider;
     }
+
+    /// <inheritdoc />
+    public IScheduleRepository Schedules =>
+        _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IScheduleRepository>();
     
     /// <inheritdoc />
-    public IScheduleRepository Schedules { get; }
+    public IMessageRepository Messages =>
+        _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IMessageRepository>();
     
     /// <inheritdoc />
-    public IMessageRepository Messages { get; }
+    public ISenderRepository Senders =>
+        _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<ISenderRepository>();
     
     /// <inheritdoc />
-    public ISenderRepository Senders { get; }
-    
-    /// <inheritdoc />
-    public IRecipientRepository Recipients { get; }
+    public IRecipientRepository Recipients =>
+        _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IRecipientRepository>();
 }

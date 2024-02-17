@@ -1,32 +1,33 @@
-﻿using NotifierBot.Business.Services.DataManagement;
+﻿using Microsoft.Extensions.DependencyInjection;
+using NotifierBot.Business.Services.DataManagement;
 
 namespace NotifierBot.Business.Impl.Services.DataManagement;
 
 /// <inheritdoc cref="IDataManagementFacade" />
 internal sealed class DataManagementFacade : IDataManagementFacade
 {
+    private readonly IServiceProvider _serviceProvider;
+
     /// <inheritdoc cref="DataManagementFacade" />
     public DataManagementFacade(
-        ISenderManager senders,
-        IRecipientManager recipients,
-        IMessageManager messages,
-        IScheduleManager schedules)
+        IServiceProvider serviceProvider)
     {
-        Senders = senders;
-        Recipients = recipients;
-        Messages = messages;
-        Schedules = schedules;
+        _serviceProvider = serviceProvider;
     }
     
     /// <inheritdoc />
-    public ISenderManager Senders { get; }
+    public ISenderManager Senders
+        => _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<ISenderManager>();
     
     /// <inheritdoc />
-    public IRecipientManager Recipients { get; }
+    public IRecipientManager Recipients
+        => _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IRecipientManager>();
     
     /// <inheritdoc />
-    public IMessageManager Messages { get; }
+    public IMessageManager Messages
+        => _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IMessageManager>();
     
     /// <inheritdoc />
-    public IScheduleManager Schedules { get; }
+    public IScheduleManager Schedules
+        => _serviceProvider.CreateScope().ServiceProvider.GetRequiredService<IScheduleManager>();
 }

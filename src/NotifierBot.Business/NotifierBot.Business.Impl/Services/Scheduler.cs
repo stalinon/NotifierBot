@@ -43,19 +43,10 @@ internal sealed class Scheduler : IScheduler
             settings,
             cancellationToken);
 
-        if (schedule != null)
+        if (schedule is null or { IsActive: false })
         {
             return;
         }
-
-        schedule = new Infrastructure.Models.Api.Schedule
-        {
-            IsActive = true,
-            MessageId = message.Id,
-            CronExpression = settings.CronExpression
-        };
-
-        await _dataManagement.Schedules.CreateAsync(schedule, cancellationToken);
 
         var sender = await _dataManagement.Senders.ReadAsync(message.SenderId, cancellationToken);
         var recipient = await _dataManagement.Recipients.ReadAsync(message.RecipientId, cancellationToken);
@@ -94,10 +85,20 @@ internal sealed class Scheduler : IScheduler
             throw new ErrorException(HttpStatusCode.NotFound, $"Не найдено расписание #({settings.MessageId}:{settings.CronExpression})");
         }
 
-        var oldTrigger = await _scheduler.GetTrigger(new TriggerKey(schedule.Id.ToString()), cancellationToken);
-        if (oldTrigger == null)
+        if (!schedule.IsActive)
         {
+            await UnscheduleMessageAsync(settings, cancellationToken);
             return;
+        }
+
+        var oldTrigger = await _scheduler.GetTrigger(new TriggerKey(schedule.Id.ToString()), cancellationToken);
+        switch (oldTrigger)
+        {
+            case null when !schedule.IsActive:
+                return;
+            case null when schedule.IsActive:
+                await ScheduleMessageAsync(schedule, cancellationToken);
+                return;
         }
 
         var newTrigger = TriggerBuilder.Create()
@@ -109,7 +110,7 @@ internal sealed class Scheduler : IScheduler
         schedule.CronExpression = cron;
         await _dataManagement.Schedules.UpdateAsync(schedule, cancellationToken);
 
-        await _scheduler.RescheduleJob(oldTrigger.Key, newTrigger, cancellationToken);
+        await _scheduler.RescheduleJob(oldTrigger!.Key, newTrigger, cancellationToken);
     }
 
     /// <inheritdoc />
