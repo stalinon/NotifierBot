@@ -1,0 +1,29 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore NotifierBot.sln
+    - name: Build
+      run: dotnet build --no-restore NotifierBot.sln
+    - name: Test
+      run: dotnet test --no-build --verbosity normal NotifierBot.sln
+    - name: Trigger next workflow
+      if: success()
+      uses: peter-evans/repository-dispatch@v1
+      with:
+        token: ${{ secrets.REPO_GHA_PAT }}
+        repository: ${{ github.repository }}
+        event-type: Docker Image Builder
+        client-payload: '{"ref": "${{ github.ref }}", "sha": "${{ github.sha }}"}'
